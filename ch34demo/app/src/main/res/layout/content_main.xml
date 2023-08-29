@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    android:background="@color/grey_light"
+    android:padding="@dimen/dp_5"
+    android:orientation="vertical"
+    >
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="2"
+        >
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvDevice"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+    </androidx.core.widget.NestedScrollView>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:background="@drawable/ll_round"
+        android:padding="@dimen/dp_10"
+
+        >
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            >
+            <TextView
+                android:text="接收数据区"
+                android:textStyle="bold"
+                android:id="@+id/tvReadCount"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                />
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/scRead"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/dp_20"
+                android:textOff="关"
+                android:textOn="开"
+                android:checked="true"
+                android:text="HEX"
+                app:switchPadding="@dimen/dp_5"
+                app:switchMinWidth="@dimen/dp_50"
+                />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:layout_marginTop="@dimen/dp_5"
+            >
+            <TextView
+                android:id="@+id/tvReadData"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                android:textColor="@color/black"
+                android:background="@drawable/ll_border"
+                android:fadeScrollbars="false"
+                android:scrollbars="vertical"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:textSize="@dimen/sp_14"
+                />
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:layout_marginStart="@dimen/dp_10"
+                >
+                <com.example.ch34demo.ui.CustomTextView
+                    android:id="@+id/tvClearRead"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="清空"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    android:textSize="@dimen/sp_14"
+                    tools:ignore="MissingClass" />
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/sample_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Press a button to get started"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            />
+        <Button
+            android:id="@+id/button_benchmark"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/button_benchmark"
+            android:onClick="runBenchmark"
+            android:layout_marginBottom="50dp"
+            app:layout_constraintBottom_toBottomOf="@id/button_record"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            />
+        <Button
+            android:id="@+id/button_record"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/button_record"
+            android:onClick="onMicButtonClicked"
+            android:layout_marginBottom="0dp"
+            app:layout_constraintBottom_toBottomOf="@id/bps_spinner"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="@id/button_benchmark" />
+        <TextView
+            android:id="@+id/bps_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Bits Per Second:"
+            android:layout_marginBottom="20dp"
+            app:layout_constraintBottom_toBottomOf="@id/button_decode"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="@id/bps_spinner"
+            app:layout_constraintTop_toTopOf="@id/button_record" />
+        <Spinner
+            android:id="@+id/bps_spinner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            app:layout_constraintBottom_toBottomOf="@id/button_decode"
+            app:layout_constraintLeft_toLeftOf="@id/bps_text"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="@id/button_record" />
+        <Button
+            android:id="@+id/button_decode"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/button_decode"
+            android:layout_marginBottom="40dp"
+            android:onClick="onDecodeButtonClicked"
+            app:layout_constraintBottom_toBottomOf="@id/sample_text"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            />
+
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+</LinearLayout>
