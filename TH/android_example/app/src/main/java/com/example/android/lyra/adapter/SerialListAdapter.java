@@ -100,7 +100,7 @@ public class SerialListAdapter extends RecyclerView.Adapter<SerialListAdapter.My
                             showToast("设置成功");
 
                             //串口初始化
-                            holder.writeBuffer.setText("4154");
+                            holder.writeBuffer.setText("41540d0a");
                             holder.write.performClick();
                             
 
