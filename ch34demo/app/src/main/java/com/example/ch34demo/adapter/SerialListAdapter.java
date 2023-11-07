@@ -1,12 +1,17 @@
 package com.example.ch34demo.adapter;
 
+import static android.content.ContentValues.TAG;
+
 import android.hardware.usb.UsbDevice;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.TextUtils;
+import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -28,12 +33,20 @@ import com.example.ch34demo.entity.SerialEntity;
 import com.example.ch34demo.ui.CustomTextView;
 import com.example.ch34demo.ui.SerialConfigDialog;
 import com.example.ch34demo.utils.FormatUtil;
+import com.orhanobut.dialogplus.DialogPlus;
+import com.orhanobut.dialogplus.OnClickListener;
+import com.orhanobut.dialogplus.OnItemClickListener;
+import com.orhanobut.dialogplus.ViewHolder;
 
 import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Timer;
+import java.util.TimerTask;
 
 
 import cn.wch.uartlib.WCHUARTManager;
@@ -44,6 +57,14 @@ public class SerialListAdapter extends RecyclerView.Adapter<SerialListAdapter.My
     private FragmentActivity activity;
     private ArrayList<SerialEntity> serialEntities;
     private HashMap<Integer, Integer> writeCountMap;
+
+    private String ATStr;
+    private Timer mTimer;
+    private TimerTask mTimerTask;
+
+    private  MyViewHolder MyViewHolder;
+    private SerialEntity serialEntities2;
+
 
     private Handler handler=new Handler(Looper.getMainLooper());
 
@@ -61,6 +82,9 @@ public class SerialListAdapter extends RecyclerView.Adapter<SerialListAdapter.My
 
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
+
+        serialEntities2 = serialEntities.get(position);
+
         SerialEntity serialEntity = serialEntities.get(position);
         writeCountMap.put(serialEntity.getSerialNumber(),0);
         holder.tvDescription.setText(String.format(Locale.getDefault(),"串口%d",serialEntity.getSerialNumber()));
@@ -109,37 +133,53 @@ public class SerialListAdapter extends RecyclerView.Adapter<SerialListAdapter.My
         holder.write.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String s = holder.writeBuffer.getText().toString();
-                if(TextUtils.isEmpty(s)){
-                    showToast("发送内容为空");
-                    return;
-                }
-                byte[] bytes = null;
-                if(holder.scWrite.isChecked()){
-                    if(!s.matches("([0-9|a-f|A-F]{2})*")){
-                        showToast("发送内容不符合HEX规范");
-                        return;
-                    }
-                    bytes= FormatUtil.hexStringToBytes(s);
-                }else {
-                    bytes = s.getBytes(StandardCharsets.UTF_8);
-                }
-                int ret = writeData(serialEntity.getUsbDevice(), serialEntity.getSerialNumber(), bytes, bytes.length);
-                if(ret>0){
-                    //更新发送计数
-                    int writeCount = getWriteCount(serialEntity.getSerialNumber());
-                    writeCount+=ret;
-                    setWriteCount(serialEntity.getSerialNumber(),writeCount);
-                    holder.writeCount.setText(String.format(Locale.getDefault(),"发送计数：%d字节",writeCount));
-                    //showToast("发送成功");
-                }else {
-                    showToast("发送失败");
+//                     String s =  holder.writeBuffer.getText().toString();
+//                if (ATStr != null){
+//                    StringBuilder hex = new StringBuilder();
+//                    for (char ch : s.toCharArray()) {
+//                        hex.append(Integer.toHexString((int) ch));
+//                    }
+//                    s = ATStr + hex.toString()+"0d0a";
+//                    showToast("数据"+s);
+//
+//                }
+//
+//                if(TextUtils.isEmpty(s)){
+//                    showToast("发送内容为空");
+//                    return;
+//                }
+//                byte[] bytes = null;
+//                if(holder.scWrite.isChecked()){
+//                    if(!s.matches("([0-9|a-f|A-F]{2})*")){
+//                        showToast("发送内容不符合HEX规范");
+//                        return;
+//                    }
+//                    bytes= FormatUtil.hexStringToBytes(s);
+//                }else {
+//                    bytes = s.getBytes(StandardCharsets.UTF_8);
+//                }
+//                int ret = writeData(serialEntity.getUsbDevice(), serialEntity.getSerialNumber(), bytes, bytes.length);
+//                if(ret>0){
+//                    //更新发送计数
+//                    int writeCount = getWriteCount(serialEntity.getSerialNumber());
+//                    writeCount+=ret;
+//                    setWriteCount(serialEntity.getSerialNumber(),writeCount);
+//                    holder.writeCount.setText(String.format(Locale.getDefault(),"发送计数：%d字节",writeCount));
+//                    //showToast("发送成功");
+//                }else {
+//                    showToast("发送失败");
+//                }
+
+                if (mTimer == null){
+                    MyViewHolder = holder;
+                    startTimer();
                 }
             }
         });
         holder.clearWrite.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                pauseTimer();
                 setWriteCount(serialEntity.getSerialNumber(),0);
                 holder.writeBuffer.setText("");
                 holder.writeCount.setText(String.format(Locale.getDefault(),"发送计数：%d字节",getWriteCount(serialEntity.getSerialNumber())));
@@ -159,6 +199,177 @@ public class SerialListAdapter extends RecyclerView.Adapter<SerialListAdapter.My
                 }
             }
         });
+
+
+
+
+        holder.At.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                pauseTimer();
+                holder.writeBuffer.setText("41540d0a");
+            }
+        });
+
+        holder.AT_RST.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                pauseTimer();
+                holder.writeBuffer.setText("41542b5253540d0a");
+            }
+        });
+
+        holder.AT_FREQ.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                pauseTimer();
+                holder.writeBuffer.setText("41542b465245513d3438353030303030302c3438353030303030302c3438353030303030300d0a");
+
+            }
+        });
+
+        holder.AT_RATE.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DialogPlus dialogPlus = DialogPlus.newDialog(v.getContext())
+                        .setContentHolder(new ViewHolder(R.layout.dialog_rate_layout))
+                        .setOnItemClickListener(new OnItemClickListener() {
+                            @Override
+                            public void onItemClick(DialogPlus dialog, Object item, View view, int position) {
+                                Button button = view.findViewById(R.id.btn_7);
+                                button.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                    }
+                                });
+                            }
+                        })
+                        .create();
+                Button button7 = (Button) dialogPlus.findViewById(R.id.btn_7);
+                Button button8 = (Button) dialogPlus.findViewById(R.id.btn_8);
+                Button button9 = (Button) dialogPlus.findViewById(R.id.btn_9);
+                Button button10 = (Button) dialogPlus.findViewById(R.id.btn_10);
+                Button button11 = (Button) dialogPlus.findViewById(R.id.btn_11);
+                Button button12 = (Button) dialogPlus.findViewById(R.id.btn_12);
+                Button button13 = (Button) dialogPlus.findViewById(R.id.btn_13);
+                Button button14 = (Button) dialogPlus.findViewById(R.id.btn_14);
+                Button button15 = (Button) dialogPlus.findViewById(R.id.btn_15);
+                Button button16 = (Button) dialogPlus.findViewById(R.id.btn_16);
+                Button button17 = (Button) dialogPlus.findViewById(R.id.btn_17);
+                Button button18 = (Button) dialogPlus.findViewById(R.id.btn_18);
+
+                button7.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        holder.writeBuffer.setText("41542b524154453d370d0a");
+                        dialogPlus.dismiss();
+                    }
+                });
+                button8.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        holder.writeBuffer.setText("41542b524154453d380d0a");
+                        dialogPlus.dismiss();
+                    }
+                });
+                button9.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        holder.writeBuffer.setText("41542b524154453d390d0a");
+                        dialogPlus.dismiss();
+                    }
+                });
+                button10.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        holder.writeBuffer.setText("41542b524154453d31300d0a");
+                        dialogPlus.dismiss();
+                    }
+                });
+                button11.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        holder.writeBuffer.setText("41542b524154453d31310d0a");
+                        dialogPlus.dismiss();
+                    }
+                });
+                button12.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        holder.writeBuffer.setText("41542b524154453d31320d0a");
+                        dialogPlus.dismiss();
+                    }
+                });
+                button13.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        holder.writeBuffer.setText("41542b524154453d31330d0a");
+                        dialogPlus.dismiss();
+                    }
+                });
+                button14.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        holder.writeBuffer.setText("41542b524154453d31340d0a");
+                        dialogPlus.dismiss();
+                    }
+                });
+                button15.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        holder.writeBuffer.setText("41542b524154453d31350d0a");
+                        dialogPlus.dismiss();
+                    }
+                });
+                button16.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        holder.writeBuffer.setText("41542b524154453d31360d0a");
+                        dialogPlus.dismiss();
+                    }
+                });
+                button17.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        holder.writeBuffer.setText("41542b524154453d31370d0a");
+                        dialogPlus.dismiss();
+                    }
+                });
+                button18.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        holder.writeBuffer.setText("41542b524154453d31380d0a");
+                        dialogPlus.dismiss();
+                    }
+                });
+
+                dialogPlus.show();
+
+
+            }
+        });
+
+        holder.AT_MAXBYTE.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                pauseTimer();
+                holder.writeBuffer.setText("41542b4d4158425954453d3432300d0a");
+
+            }
+        });
+
+
+        holder.AT_SENDB.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                pauseTimer();
+                ATStr = "41542b53454e44423d";
+            }
+        });
+
+
+
+
     }
 
     @Override
@@ -189,11 +400,8 @@ public class SerialListAdapter extends RecyclerView.Adapter<SerialListAdapter.My
                             break;
                     }
                 }
-
             }
         }
-
-
     }
 
     public void updateModemStatus(ModemEntity modemEntity){
@@ -263,8 +471,7 @@ public class SerialListAdapter extends RecyclerView.Adapter<SerialListAdapter.My
         EditText writeBuffer;
 
 
-        CustomTextView initDevice;
-        CustomTextView reset;
+        CustomTextView clearRead,At,AT_RST,AT_FREQ,AT_RATE,AT_MAXBYTE,AT_SENDB;
 
 
 
@@ -298,8 +505,13 @@ public class SerialListAdapter extends RecyclerView.Adapter<SerialListAdapter.My
 
             scWrite=itemView.findViewById(R.id.scWrite);
 
-            initDevice = itemView.findViewById(R.id.initDevice);
-            reset = itemView.findViewById(R.id.reset);
+            At=itemView.findViewById(R.id.AT);
+            AT_RST=itemView.findViewById(R.id.AT_RST);
+            AT_FREQ=itemView.findViewById(R.id.AT_FREQ);
+            AT_RATE=itemView.findViewById(R.id.AT_RATE);
+            AT_MAXBYTE=itemView.findViewById(R.id.AT_MAXBYTE);
+            AT_SENDB=itemView.findViewById(R.id.AT_SENDB);
+
 
         }
     }
@@ -383,5 +595,69 @@ public class SerialListAdapter extends RecyclerView.Adapter<SerialListAdapter.My
         });
 
     }
+
+
+    private void startTimer() {
+        mTimer = new Timer();
+        mTimerTask = new TimerTask() {
+            @Override
+            public void run() {
+                // 在这里编写定时任务的逻辑
+                writeData();
+            }
+        };
+        mTimer.schedule(mTimerTask, 0, 1000); // 每隔1秒执行一次任务
+    }
+
+    private void pauseTimer() {
+        if (mTimer != null) {
+            mTimer.cancel();
+            mTimer = null;
+        }
+        if (mTimerTask != null) {
+            mTimerTask.cancel();
+            mTimerTask = null;
+        }
+    }
+
+
+    private void writeData() {
+
+        String s = MyViewHolder.writeBuffer.getText().toString();
+        if (ATStr != null){
+                    StringBuilder hex = new StringBuilder();
+                    for (char ch : s.toCharArray()) {
+                        hex.append(Integer.toHexString((int) ch));
+                    }
+                    s = ATStr + hex.toString()+"0d0a";
+                }
+
+                if(TextUtils.isEmpty(s)){
+                    showToast("发送内容为空");
+                    return;
+                }
+                byte[] bytes = null;
+                if(MyViewHolder.scWrite.isChecked()){
+                    if(!s.matches("([0-9|a-f|A-F]{2})*")){
+                        showToast("发送内容不符合HEX规范");
+                        return;
+                    }
+                    bytes= FormatUtil.hexStringToBytes(s);
+                }else {
+                    bytes = s.getBytes(StandardCharsets.UTF_8);
+                }
+                int ret = writeData(serialEntities2.getUsbDevice(), serialEntities2.getSerialNumber(), bytes, bytes.length);
+                if(ret>0){
+                    //更新发送计数
+                    int writeCount = getWriteCount(serialEntities2.getSerialNumber());
+                    writeCount+=ret;
+                    setWriteCount(serialEntities2.getSerialNumber(),writeCount);
+                    MyViewHolder.writeCount.setText(String.format(Locale.getDefault(),"发送计数：%d字节",writeCount));
+                    //showToast("发送成功");
+                }else {
+                    showToast("发送失败");
+                }
+    }
+
 
 }

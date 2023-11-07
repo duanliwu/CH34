@@ -49,8 +49,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -441,6 +443,7 @@ public class MainActivity extends AppCompatActivity {
         //初始化recyclerview
         deviceRecyclerVIew.setNestedScrollingEnabled(false);
         deviceAdapter =new DeviceAdapter(this);
+
 
         deviceRecyclerVIew.setLayoutManager(new LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false));
         deviceAdapter.setEmptyView(LayoutInflater.from(this).inflate(R.layout.empty_view,deviceRecyclerVIew,false));
@@ -851,8 +854,14 @@ public class MainActivity extends AppCompatActivity {
                     result=new String(buffer,0,length);
                 }
                 String readBufferLogPrefix = FormatUtil.getReadBufferLogPrefix(usbDevice, serialNumber,integer);
+
+                Date currentDate = new Date(System.currentTimeMillis());
+                SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
+                String  time = dateFormat.format(currentDate);
+
+
                 //LogUtil.d(readBufferLogPrefix);
-                readBuffer.append(readBufferLogPrefix+result+"\r\n");
+                readBuffer.append( time + readBufferLogPrefix+ result+"\r\n");
                 int offset = readBuffer.getLineCount() * readBuffer.getLineHeight();
                 //int maxHeight = usbReadValue.getMaxHeight();
                 int height = readBuffer.getHeight();
@@ -937,5 +946,16 @@ public class MainActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
         }
+    }
+
+    //hex转字符串
+    public static String hexToString(String hex) {
+        StringBuilder sb = new StringBuilder();
+        for (int count = 0; count < hex.length() - 1; count += 2) {
+            String output = hex.substring(count, (count + 2));    //grab the hex in pairs
+            int decimal = Integer.parseInt(output, 16);    //convert hex to decimal
+            sb.append((char) decimal);    //convert the decimal to character
+        }
+        return sb.toString();
     }
 }
