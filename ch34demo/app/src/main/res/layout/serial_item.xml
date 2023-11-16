@@ -279,8 +279,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:text="AT"
-            android:layout_margin="@dimen/dp_10"
-            />
+            android:layout_margin="@dimen/dp_10" />
         <com.example.ch34demo.ui.CustomTextView
             android:id="@+id/AT_RST"
             android:layout_width="wrap_content"
@@ -290,6 +289,14 @@
             android:layout_margin="@dimen/dp_10"
             />
         <com.example.ch34demo.ui.CustomTextView
+            android:id="@+id/AT_WORKMODE"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="AT+WORKMODE"
+            android:layout_margin="@dimen/dp_10" />
+
+        <com.example.ch34demo.ui.CustomTextView
             android:id="@+id/AT_FREQ"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -297,6 +304,10 @@
             android:text="AT+FREQ"
             android:layout_margin="@dimen/dp_10"
             />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
         <com.example.ch34demo.ui.CustomTextView
             android:id="@+id/AT_RATE"
             android:layout_width="wrap_content"
@@ -305,10 +316,6 @@
             android:text="AT+RATE"
             android:layout_margin="@dimen/dp_10"
             />
-    </LinearLayout>
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
         <com.example.ch34demo.ui.CustomTextView
             android:id="@+id/AT_MAXBYTE"
             android:layout_width="wrap_content"

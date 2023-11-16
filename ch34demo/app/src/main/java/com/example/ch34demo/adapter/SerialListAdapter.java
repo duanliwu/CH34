@@ -64,6 +64,7 @@ public class SerialListAdapter extends RecyclerView.Adapter<SerialListAdapter.My
 
     private  MyViewHolder MyViewHolder;
     private SerialEntity serialEntities2;
+    private  int timer = 1000;
 
 
     private Handler handler=new Handler(Looper.getMainLooper());
@@ -223,7 +224,7 @@ public class SerialListAdapter extends RecyclerView.Adapter<SerialListAdapter.My
             @Override
             public void onClick(View v) {
                 pauseTimer();
-                holder.writeBuffer.setText("41542b465245513d3438353030303030302c3438353030303030302c3438353030303030300d0a");
+                holder.writeBuffer.setText("41542b465245513d3438333230303030302c3438333230303030302c3438333230303030300d0a");
 
             }
         });
@@ -261,6 +262,7 @@ public class SerialListAdapter extends RecyclerView.Adapter<SerialListAdapter.My
                 button7.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        timer = 4000;
                         holder.writeBuffer.setText("41542b524154453d370d0a");
                         dialogPlus.dismiss();
                     }
@@ -268,6 +270,7 @@ public class SerialListAdapter extends RecyclerView.Adapter<SerialListAdapter.My
                 button8.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        timer = 4000;
                         holder.writeBuffer.setText("41542b524154453d380d0a");
                         dialogPlus.dismiss();
                     }
@@ -275,6 +278,7 @@ public class SerialListAdapter extends RecyclerView.Adapter<SerialListAdapter.My
                 button9.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        timer = 1000;
                         holder.writeBuffer.setText("41542b524154453d390d0a");
                         dialogPlus.dismiss();
                     }
@@ -282,6 +286,7 @@ public class SerialListAdapter extends RecyclerView.Adapter<SerialListAdapter.My
                 button10.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        timer = 1000;
                         holder.writeBuffer.setText("41542b524154453d31300d0a");
                         dialogPlus.dismiss();
                     }
@@ -289,6 +294,7 @@ public class SerialListAdapter extends RecyclerView.Adapter<SerialListAdapter.My
                 button11.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        timer = 1000;
                         holder.writeBuffer.setText("41542b524154453d31310d0a");
                         dialogPlus.dismiss();
                     }
@@ -296,6 +302,7 @@ public class SerialListAdapter extends RecyclerView.Adapter<SerialListAdapter.My
                 button12.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        timer = 1000;
                         holder.writeBuffer.setText("41542b524154453d31320d0a");
                         dialogPlus.dismiss();
                     }
@@ -303,6 +310,7 @@ public class SerialListAdapter extends RecyclerView.Adapter<SerialListAdapter.My
                 button13.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        timer = 1000;
                         holder.writeBuffer.setText("41542b524154453d31330d0a");
                         dialogPlus.dismiss();
                     }
@@ -310,6 +318,7 @@ public class SerialListAdapter extends RecyclerView.Adapter<SerialListAdapter.My
                 button14.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        timer = 1000;
                         holder.writeBuffer.setText("41542b524154453d31340d0a");
                         dialogPlus.dismiss();
                     }
@@ -317,6 +326,7 @@ public class SerialListAdapter extends RecyclerView.Adapter<SerialListAdapter.My
                 button15.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        timer = 1000;
                         holder.writeBuffer.setText("41542b524154453d31350d0a");
                         dialogPlus.dismiss();
                     }
@@ -324,6 +334,7 @@ public class SerialListAdapter extends RecyclerView.Adapter<SerialListAdapter.My
                 button16.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        timer = 1000;
                         holder.writeBuffer.setText("41542b524154453d31360d0a");
                         dialogPlus.dismiss();
                     }
@@ -331,6 +342,7 @@ public class SerialListAdapter extends RecyclerView.Adapter<SerialListAdapter.My
                 button17.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        timer = 1000;
                         holder.writeBuffer.setText("41542b524154453d31370d0a");
                         dialogPlus.dismiss();
                     }
@@ -338,6 +350,7 @@ public class SerialListAdapter extends RecyclerView.Adapter<SerialListAdapter.My
                 button18.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        timer = 1000;
                         holder.writeBuffer.setText("41542b524154453d31380d0a");
                         dialogPlus.dismiss();
                     }
@@ -363,11 +376,19 @@ public class SerialListAdapter extends RecyclerView.Adapter<SerialListAdapter.My
             @Override
             public void onClick(View v) {
                 pauseTimer();
+                holder.writeBuffer.setText("");
                 ATStr = "41542b53454e44423d";
             }
         });
 
 
+        holder.AT_WORKMODE.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                pauseTimer();
+                holder.writeBuffer.setText("41542b574f524b4d4f44453d32310d0a");
+            }
+        });
 
 
     }
@@ -471,7 +492,7 @@ public class SerialListAdapter extends RecyclerView.Adapter<SerialListAdapter.My
         EditText writeBuffer;
 
 
-        CustomTextView clearRead,At,AT_RST,AT_FREQ,AT_RATE,AT_MAXBYTE,AT_SENDB;
+        CustomTextView clearRead,At,AT_RST,AT_WORKMODE,AT_FREQ,AT_RATE,AT_MAXBYTE,AT_SENDB;
 
 
 
@@ -507,6 +528,7 @@ public class SerialListAdapter extends RecyclerView.Adapter<SerialListAdapter.My
 
             At=itemView.findViewById(R.id.AT);
             AT_RST=itemView.findViewById(R.id.AT_RST);
+            AT_WORKMODE = itemView.findViewById(R.id.AT_WORKMODE);
             AT_FREQ=itemView.findViewById(R.id.AT_FREQ);
             AT_RATE=itemView.findViewById(R.id.AT_RATE);
             AT_MAXBYTE=itemView.findViewById(R.id.AT_MAXBYTE);
@@ -606,7 +628,7 @@ public class SerialListAdapter extends RecyclerView.Adapter<SerialListAdapter.My
                 writeData();
             }
         };
-        mTimer.schedule(mTimerTask, 0, 1000); // 每隔1秒执行一次任务
+        mTimer.schedule(mTimerTask, 0, timer); // 每隔1秒执行一次任务
     }
 
     private void pauseTimer() {
