@@ -4,6 +4,51 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <Button
+            android:id="@+id/btn_2"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="2---速率 101bps"
+            android:layout_weight="1"
+            android:gravity="center"
+            />
+        <Button
+            android:id="@+id/btn_3"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="3---速率201bps"
+            android:layout_weight="1"
+            android:gravity="center"
+            />
+        <Button
+            android:id="@+id/btn_4"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="4---速率 441bps"
+            android:layout_weight="1"
+            android:gravity="center"
+            />
+        <Button
+            android:id="@+id/btn_5"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="5---速率 934bps"
+            android:layout_weight="1"
+            android:gravity="center"
+            />
+        <Button
+            android:id="@+id/btn_6"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="6---速率 1868bps"
+            android:layout_weight="1"
+            android:gravity="center"
+            />
+    </LinearLayout>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">

@@ -332,6 +332,14 @@
             android:text="AT+SENDB"
             android:layout_margin="@dimen/dp_10"
             />
+        <com.example.ch34demo.ui.CustomTextView
+            android:id="@+id/AT_TXP"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="AT+TXP=15"
+            android:layout_margin="@dimen/dp_10"
+            />
 
     </LinearLayout>
 

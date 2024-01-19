@@ -12,6 +12,7 @@ import android.media.AudioTrack;
 import android.media.MediaRecorder;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -46,6 +47,7 @@ import com.tencent.bugly.crashreport.CrashReport;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -90,7 +92,8 @@ public class MainActivity extends AppCompatActivity {
     //接收文件测试。文件默认保存在-->内部存储\Android\data\cn.wch.wchuartdemo\files\下
     private static boolean FILE_TEST=false;
 
-
+    public static final File SNAPSHOT = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM), "/logText");
+    private File mFile;
 
 
     //lyra
@@ -520,6 +523,8 @@ public class MainActivity extends AppCompatActivity {
      * @param usbDevice
      */
     void open(@NonNull UsbDevice usbDevice){
+        openLog();
+
         if(WCHUARTManager.getInstance().isConnected(usbDevice)){
             showToast("当前设备已经打开");
             return;
@@ -856,12 +861,18 @@ public class MainActivity extends AppCompatActivity {
                 String readBufferLogPrefix = FormatUtil.getReadBufferLogPrefix(usbDevice, serialNumber,integer);
 
                 Date currentDate = new Date(System.currentTimeMillis());
-                SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                 String  time = dateFormat.format(currentDate);
+
+
+                if(result.length()>1){
+                    InputFile(time + readBufferLogPrefix +result);
+                }
 
 
                 //LogUtil.d(readBufferLogPrefix);
                 readBuffer.append( time + readBufferLogPrefix+ result+"\r\n");
+
                 int offset = readBuffer.getLineCount() * readBuffer.getLineHeight();
                 //int maxHeight = usbReadValue.getMaxHeight();
                 int height = readBuffer.getHeight();
@@ -958,4 +969,58 @@ public class MainActivity extends AppCompatActivity {
         }
         return sb.toString();
     }
+
+    //日志
+
+    public void openLog(){
+
+        //创建文件夹
+        if (!SNAPSHOT.exists()) {
+            SNAPSHOT.mkdirs();
+        }
+
+        mFile = new File(getExternalFilesDir(null), "LogText.txt");
+        //判断文件是否存在，存在就删除
+//        if (mFile.exists()) {
+//            mFile.delete();
+//        }
+        try {
+            //创建文件
+            mFile.createNewFile();
+            Log.i("文件创建", "文件创建成功");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void InputFile(String  msgStr) {
+
+        // 获取应用的私有目录
+        File privateFolder = getExternalFilesDir(null);
+        // 创建文件对象
+        File mFile = new File(privateFolder, "logsText.txt");
+
+        try {
+            // 创建 FileWriter 对象，将第二个参数设为 true 表示追加写入
+            FileWriter writer = new FileWriter(mFile, true);
+
+//            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+//            String currentTime = dateFormat.format(new Date());
+
+            // 将文本内容写入文件
+            writer.write( msgStr+ "\n\n");
+            writer.write("\n"); // 可选：每次写入后换行
+
+            // 关闭 FileWriter
+            writer.close();
+
+            Log.i("写入文件", "文本内容已成功写入到文件中");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+
+
 }

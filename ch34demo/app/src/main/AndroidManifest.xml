@@ -25,6 +25,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Ch34demo"
+        android:requestLegacyExternalStorage="true"
         tools:ignore="MissingClass">
         <activity
             android:name= "com.example.ch34demo.MainActivity"
