@@ -688,7 +688,7 @@ public class SerialListAdapter extends RecyclerView.Adapter<SerialListAdapter.My
                 writeData();
             }
         };
-        mTimer.schedule(mTimerTask, 0, timer); // 每隔1秒执行一次任务
+        mTimer.schedule(mTimerTask, 0, 2500); // 每隔1秒执行一次任务
     }
 
     private void pauseTimer() {
@@ -704,6 +704,13 @@ public class SerialListAdapter extends RecyclerView.Adapter<SerialListAdapter.My
 
 
     private void writeData() {
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String currentTime = dateFormat.format(new Date());
+
+        Log.e(TAG, "writeData: "+currentTime );
+
+
 
         String s = MyViewHolder.writeBuffer.getText().toString();
 
